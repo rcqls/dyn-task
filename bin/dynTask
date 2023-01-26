@@ -1,0 +1,18 @@
+#!/usr/bin/env ruby
+require 'dyn-tasks'
+
+if ["--no-forever","--no-daemon"].include? ARGV[0]
+  cfg={}
+  cfg[:dyntasks_root]=ARGV[1] if ARGV[1]
+  DynTasks::filewatcher(cfg)
+else
+  require 'daemons'
+  require 'fileutils'
+
+  dir_pids=File.join(DynTasks.home,"pids")
+  FileUtils.mkdir_p dir_pids
+  Daemons.run_proc('dyn-task',{dir: dir_pids}) do
+      DynTasks::filewatcher
+  end
+
+end
